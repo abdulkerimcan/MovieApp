@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 enum ServiceError: Error {
     case badRequest
@@ -21,64 +22,48 @@ final class MovieService {
     ]
     private init() { }
     
-    func fetchMovies<T:Codable>(type: T.Type, endPoint: EndPoint, completion: @escaping (Result<T,Error>) -> ()) {
+    func fetchMovies<T:Codable>(type: T.Type, endPoint: EndPoint) -> AnyPublisher<T,Error> {
+        
         guard let url = endPoint.getUrl() else {
-            completion(.failure(ServiceError.badRequest))
-            return
-        }
-        var request = URLRequest(url: url,cachePolicy: .useProtocolCachePolicy,timeoutInterval: 10.0)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
-        let dataTask = session.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            
-            guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-                completion(.failure(ServiceError.badRequest))
-                return
-            }
-            
-            guard let data = data else {
-                completion(.failure(ServiceError.dataError))
-                return
-            }
-            do {
-                let datas = try JSONDecoder().decode(T.self, from: data)
-                completion(.success(datas))
-            } catch {
-                completion(.failure(error))
-            }
-        }
-        
-        dataTask.resume()
-    }
-    
-    func downloadImage(from urlString: String, completion: @escaping (Data?) -> Void) {
-        guard let url = URL(string: "\(EndPoint.imageURL)\(urlString)") else {
-            completion(nil)
-            return
+            return Fail(error: ServiceError.badRequest).eraseToAnyPublisher()
         }
         
         var request = URLRequest(url: url,cachePolicy: .useProtocolCachePolicy,timeoutInterval: 10.0)
         request.httpMethod = "GET"
         request.allHTTPHeaderFields = headers
         
-        let task = session.dataTask(with: url) { data, response, error in
-            guard let data = data, error == nil else {
-                print("Error downloading image: \(error?.localizedDescription ?? "Unknown error")")
-                DispatchQueue.main.async {
-                    completion(nil)
+        return session.dataTaskPublisher(for: request)
+            .map(\.data)
+            .decode(type: T.self, decoder: JSONDecoder())
+            .mapError { error in
+                switch error {
+                case is URLError:
+                    return error
+                case is DecodingError:
+                    return error
+                default:
+                    return ServiceError.dataError
                 }
-                return
             }
-            
-            completion(data)
-            
-        }
-        
-        task.resume()
+            .eraseToAnyPublisher()
     }
     
+    func downloadImage(from urlString: String) -> AnyPublisher<Data,Error> {
+        guard let url = URL(string: "\(EndPoint.imageURL)\(urlString)") else {
+            return Fail(error: ServiceError.badRequest).eraseToAnyPublisher()
+            
+        }
+        var request = URLRequest(url: url,cachePolicy: .useProtocolCachePolicy,timeoutInterval: 10.0)
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = headers
+        
+        return session.dataTaskPublisher(for: request)
+            .catch { error in
+                return Fail(error: error)
+            }
+            .receive(on: DispatchQueue.main)
+            .map(\.data)
+            .eraseToAnyPublisher()
+
+    }
 }

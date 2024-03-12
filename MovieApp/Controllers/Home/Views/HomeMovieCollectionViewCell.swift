@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 final class HomeMovieCollectionViewCell: UICollectionViewCell {
     static let identifier = "HomeMovieCollectionViewCell"
@@ -48,6 +49,8 @@ final class HomeMovieCollectionViewCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 18, weight: .bold)
         return label
     }()
+    
+    var cancellables = Set<AnyCancellable>()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -96,17 +99,21 @@ final class HomeMovieCollectionViewCell: UICollectionViewCell {
     }
     
     func configure(with movie: MovieResult) {
+        MovieService.shared.downloadImage(from: movie.backdropPath)
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            } receiveValue: { data in
+                let image = UIImage(data: data)
+                self.imageView.image = image
+            }.store(in: &cancellables)
+
         titleLabel.text = movie.title
         let voteValue = (movie.voteAverage * 10).rounded() / 10
         voteAverageLabel.text = "\(voteValue)"
-        MovieService.shared.downloadImage(from: movie.backdropPath) { data in
-            guard let data = data else {
-                return
-            }
-            DispatchQueue.main.async {
-                let image = UIImage(data: data)
-                self.imageView.image = image
-            }
-        }
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 protocol HomeViewControllerProtocol: AnyObject {
     func configureViewController()
@@ -13,6 +14,7 @@ protocol HomeViewControllerProtocol: AnyObject {
     func startSpinner()
     func stopSpinner()
     func reloadData()
+    func bind()
 }
 
 final class HomeViewController: UIViewController {
@@ -26,7 +28,11 @@ final class HomeViewController: UIViewController {
         spinner.style = .large
         return spinner
     }()
+    
     var viewModel: HomeViewModel
+    
+    var cancellables = Set<AnyCancellable>()
+    let input = PassthroughSubject<HomeViewModelInput,Never>()
     
     init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
@@ -40,12 +46,29 @@ final class HomeViewController: UIViewController {
         super.viewDidLoad()
         viewModel.view = self
         viewModel.viewDidLoad()
+        input.send(.viewDidLoad)
     }
 }
 
 //MARK: - HomeViewControllerProtocol functions
 
 extension HomeViewController: HomeViewControllerProtocol {
+    func bind() {
+        let output = viewModel.transform(input: input.eraseToAnyPublisher())
+        
+        output
+            .receive(on: DispatchQueue.main)
+            .sink { state in
+            switch state {
+            case .serviceFailed(let error):
+                print(error.localizedDescription)
+            case .serviceSucceed:
+                self.reloadData()
+            case .setLoading(let isLoading):
+                isLoading ? self.startSpinner() : self.stopSpinner()
+            }
+        }.store(in: &cancellables)
+    }
     
     func startSpinner() {
         DispatchQueue.main.async {

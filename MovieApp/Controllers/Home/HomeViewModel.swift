@@ -6,14 +6,24 @@
 //
 
 import Foundation
+import Combine
 
+enum HomeViewModelInput {
+    case viewDidLoad
+}
 
+enum HomeViewModelOutput {
+    case serviceFailed(error: Error)
+    case serviceSucceed
+    case setLoading(isLoading: Bool)
+}
 
 protocol HomeViewModelProtocol {
     var view: HomeViewControllerProtocol? {get set}
     func viewDidLoad()
     func selectMovie(at index: Int)
     func fetchMovies()
+    func transform(input: AnyPublisher<HomeViewModelInput,Never>) -> AnyPublisher<HomeViewModelOutput, Never>
 }
 
 final class HomeViewModel {
@@ -26,25 +36,41 @@ final class HomeViewModel {
                                    .popular]
     var movies: [MovieResult] = []
     
+    
+    private let output = PassthroughSubject<HomeViewModelOutput, Never>()
+    var cancellables = Set<AnyCancellable>()
+    
 }
 
 extension HomeViewModel: HomeViewModelProtocol {
+    
+    func transform(input: AnyPublisher<HomeViewModelInput, Never>) -> AnyPublisher<HomeViewModelOutput, Never> {
+        input.sink { event in
+            switch event {
+            case .viewDidLoad:
+                self.fetchMovies()
+            }
+        }.store(in: &cancellables)
+        
+        return output.eraseToAnyPublisher()
+    }
+    
+    
     func fetchMovies() {
-        view?.startSpinner()
-        MovieService.shared.fetchMovies(type: MovieRequest.self, endPoint: .popular) { [weak self] result in
-            guard let self else {
-                return
-            }
-            switch result {
-            case .success(let success):
-                self.view?.stopSpinner()
-                let movieResults = success.results
+        output.send(.setLoading(isLoading: true))
+        MovieService.shared.fetchMovies(type: MovieRequest.self, endPoint: .popular)
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    self.output.send(.setLoading(isLoading: false))
+                case .failure(let error):
+                    self.output.send(.serviceFailed(error: error))
+                }
+            } receiveValue: { movieRequest in
+                let movieResults = movieRequest.results
                 self.movies.append(contentsOf: movieResults)
-                self.view?.reloadData()
-            case .failure(let failure):
-                print(failure)
-            }
-        }
+                self.output.send(.serviceSucceed)
+            }.store(in: &cancellables)
     }
     
     func selectMovie(at index: Int) {
@@ -52,7 +78,7 @@ extension HomeViewModel: HomeViewModelProtocol {
     }
     
     func viewDidLoad() {
-        fetchMovies()
+        view?.bind()
         view?.configureViewController()
         view?.configureCollectionView()
     }
