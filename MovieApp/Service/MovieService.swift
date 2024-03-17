@@ -22,7 +22,7 @@ final class MovieService {
     ]
     private init() { }
     
-    func fetchMovies<T:Codable>(type: T.Type, endPoint: EndPoint) -> AnyPublisher<T,Error> {
+    func fetchMovies(endPoint: EndPoint) -> AnyPublisher<MovieRequest,Error> {
         
         guard let url = endPoint.getUrl() else {
             return Fail(error: ServiceError.badRequest).eraseToAnyPublisher()
@@ -34,7 +34,7 @@ final class MovieService {
         
         return session.dataTaskPublisher(for: request)
             .map(\.data)
-            .decode(type: T.self, decoder: JSONDecoder())
+            .decode(type: MovieRequest.self, decoder: JSONDecoder())
             .mapError { error in
                 switch error {
                 case is URLError:

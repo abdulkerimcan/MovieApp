@@ -11,6 +11,8 @@ import Combine
 protocol HomeViewControllerProtocol: AnyObject {
     func configureViewController()
     func configureCollectionView()
+    func navigateToDetail(movie: MovieResult)
+    func navigateToCategory(genre: Genre)
     func startSpinner()
     func stopSpinner()
     func reloadData()
@@ -53,6 +55,20 @@ final class HomeViewController: UIViewController {
 //MARK: - HomeViewControllerProtocol functions
 
 extension HomeViewController: HomeViewControllerProtocol {
+    func navigateToCategory(genre: Genre) {
+        DispatchQueue.main.async {
+            let vc = MovieListViewController(genreTitle: genre.title,viewModel: MovieListViewModel(endpoint: genre.endpoint))
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    func navigateToDetail(movie: MovieResult) {
+        DispatchQueue.main.async {
+            let vc = MovieDetailViewController(movie: movie, viewModel: MovieDetailViewModel())
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
     func bind() {
         let output = viewModel.transform(input: input.eraseToAnyPublisher())
         
@@ -146,6 +162,9 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
         viewModel.sections.count
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        viewModel.selectMovie(at: indexPath)
+    }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let section = viewModel.sections[section]
         switch section {

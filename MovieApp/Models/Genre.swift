@@ -10,4 +10,5 @@ import Foundation
 struct Genre {
     let title: String
     let imagePath: String
+    let endpoint: EndPoint
 }

@@ -83,5 +83,53 @@
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9FDC90C9-79C2-431B-AECB-DBD47592FC92"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MovieApp/Service/MovieService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "38"
+            endingLineNumber = "38"
+            landmarkName = "fetchMovies(endPoint:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "9FDC90C9-79C2-431B-AECB-DBD47592FC92 - d99c1865affb0c30"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "MovieApp.MovieService.fetchMovies(endPoint: MovieApp.EndPoint) -&gt; Combine.AnyPublisher&lt;MovieApp.MovieRequest, Swift.Error&gt;"
+                  moduleName = "MovieApp"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kerim/Desktop/IOS%20Development/MovieApp/MovieApp/Service/MovieService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "38"
+                  endingLineNumber = "38"
+                  offsetFromSymbolStart = "1160">
+               </Location>
+               <Location
+                  uuid = "9FDC90C9-79C2-431B-AECB-DBD47592FC92 - 4a9ffe02dc64c322"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Error) -&gt; Swift.Error in MovieApp.MovieService.fetchMovies(endPoint: MovieApp.EndPoint) -&gt; Combine.AnyPublisher&lt;MovieApp.MovieRequest, Swift.Error&gt;"
+                  moduleName = "MovieApp"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/kerim/Desktop/IOS%20Development/MovieApp/MovieApp/Service/MovieService.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "40"
+                  endingLineNumber = "40"
+                  offsetFromSymbolStart = "156">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
    </Breakpoints>
 </Bucket>

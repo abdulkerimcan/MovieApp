@@ -21,18 +21,28 @@ enum HomeViewModelOutput {
 protocol HomeViewModelProtocol {
     var view: HomeViewControllerProtocol? {get set}
     func viewDidLoad()
-    func selectMovie(at index: Int)
+    func selectMovie(at indexPath: IndexPath)
     func fetchMovies()
     func transform(input: AnyPublisher<HomeViewModelInput,Never>) -> AnyPublisher<HomeViewModelOutput, Never>
 }
 
 final class HomeViewModel {
     weak var view: HomeViewControllerProtocol?
-    var sections: [HomeSection] = [.discover([Genre(title: "Sci-Fi", imagePath: "scifi"),
-                                              Genre(title: "Action", imagePath: "action"),
-                                              Genre(title: "Horror", imagePath: "horror")]),
-                                   .recommend([Genre(title: "Top Rated Movies", imagePath: "toprated"),
-                                               Genre(title: "Upcoming", imagePath: "upcoming")]),
+    var sections: [HomeSection] = [.discover([Genre(title: "Sci-Fi",
+                                                    imagePath: "scifi",
+                                                    endpoint: .scifi),
+                                              Genre(title: "Action",
+                                                    imagePath: "action",
+                                                    endpoint: .action),
+                                              Genre(title: "Horror",
+                                                    imagePath: "horror",
+                                                    endpoint: .horror)]),
+                                   .recommend([Genre(title: "Top Rated Movies",
+                                                     imagePath: "toprated",
+                                                     endpoint: .topRated),
+                                               Genre(title: "Upcoming",
+                                                     imagePath: "upcoming",
+                                                     endpoint: .upcoming)]),
                                    .popular]
     var movies: [MovieResult] = []
 
@@ -57,7 +67,7 @@ extension HomeViewModel: HomeViewModelProtocol {
     
     func fetchMovies() {
         output.send(.setLoading(isLoading: true))
-        MovieService.shared.fetchMovies(type: MovieRequest.self, endPoint: .popular)
+        MovieService.shared.fetchMovies(endPoint: .popular)
             .sink { [unowned self] completion in
                 switch completion {
                 case .finished:
@@ -72,8 +82,18 @@ extension HomeViewModel: HomeViewModelProtocol {
             }.store(in: &cancellables)
     }
     
-    func selectMovie(at index: Int) {
-        
+    func selectMovie(at indexPath: IndexPath) {
+        let section = sections[indexPath.section]
+        switch section {
+        case .popular:
+            view?.navigateToDetail(movie: movies[indexPath.item])
+        case .discover(let genres):
+            let genre = genres[indexPath.item]
+            view?.navigateToCategory(genre: genre)
+        case .recommend(let genres):
+            let genre = genres[indexPath.item]
+            view?.navigateToCategory(genre: genre)
+        }
     }
     
     func viewDidLoad() {
