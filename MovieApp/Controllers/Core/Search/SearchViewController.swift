@@ -141,4 +141,7 @@ extension SearchViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         input.send(.search(query: searchText))
     }
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        input.send(.search(query: ""))
+    }
 }
