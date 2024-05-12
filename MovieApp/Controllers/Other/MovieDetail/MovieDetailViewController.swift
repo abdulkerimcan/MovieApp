@@ -37,14 +37,16 @@ final class MovieDetailViewController: UIViewController {
         let label = UILabel(frame: .zero)
         label.numberOfLines = 0
         label.font = .systemFont(ofSize: 18, weight: .medium)
-        label.textColor = .white
+        label.textColor = .label
+        label.lineBreakMode = .byTruncatingTail
+        label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private lazy var starImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.tintColor = .label
+        imageView.tintColor = .white
         imageView.image = UIImage(systemName: "star.circle.fill")
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -54,6 +56,7 @@ final class MovieDetailViewController: UIViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.textColor = .white
         return label
     }()
     
@@ -61,6 +64,7 @@ final class MovieDetailViewController: UIViewController {
         let button = UIButton(frame: .zero)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(systemName: "play.circle.fill"), for: .normal)
+        button.tintColor = .white
         button.addTarget(self, action: #selector(didTapPlayButton), for: .touchUpInside)
         button.contentVerticalAlignment = .fill
         button.contentHorizontalAlignment = .fill
@@ -126,30 +130,27 @@ extension MovieDetailViewController: MovieDetailViewControllerProtocol {
             imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             imageView.topAnchor.constraint(equalTo: view.topAnchor),
             imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            imageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.6),
+            imageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4),
             
-            
-            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
-            titleLabel.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -25),
-            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 10),
-            
-            starImageView.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-            starImageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            starImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
             starImageView.heightAnchor.constraint(equalToConstant: 30),
             starImageView.widthAnchor.constraint(equalToConstant: 30),
+            starImageView.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -10),
+            
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            titleLabel.bottomAnchor.constraint(equalTo: starImageView.topAnchor, constant: -10),
             
             voteAverageLabel.leadingAnchor.constraint(equalTo: starImageView.trailingAnchor, constant: 2),
             voteAverageLabel.topAnchor.constraint(equalTo: starImageView.topAnchor),
             voteAverageLabel.bottomAnchor.constraint(equalTo: starImageView.bottomAnchor),
             
             playButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
-            playButton.topAnchor.constraint(equalTo: titleLabel.topAnchor),
             playButton.bottomAnchor.constraint(equalTo: starImageView.bottomAnchor),
             playButton.heightAnchor.constraint(equalToConstant: 50),
             playButton.widthAnchor.constraint(equalToConstant: 50),
             
             overviewLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
-            overviewLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 10),
+            overviewLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
             overviewLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 50),
             
         ])
