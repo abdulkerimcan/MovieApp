@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-protocol MovieDetailViewControllerProtocol: AnyObject {
+protocol MovieDetailViewControllerProtocol: AnyObject, AlertPresentable {
     func configureVC()
     func configureGradient()
     func configureGradientFrame()

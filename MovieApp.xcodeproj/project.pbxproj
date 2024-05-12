@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A081A3D2BF15C49000A8197 /* AlertPresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A081A3C2BF15C49000A8197 /* AlertPresentable.swift */; };
 		0A33B7622BA5F27000B209BF /* ImageCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A33B7612BA5F27000B209BF /* ImageCacheManager.swift */; };
 		0A33B7662BA60BFE00B209BF /* MovieDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A33B7652BA60BFE00B209BF /* MovieDetailViewController.swift */; };
 		0A33B7682BA612DE00B209BF /* MovieDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A33B7672BA612DE00B209BF /* MovieDetailViewModel.swift */; };
@@ -44,6 +45,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0A081A3C2BF15C49000A8197 /* AlertPresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertPresentable.swift; sourceTree = "<group>"; };
 		0A33B7612BA5F27000B209BF /* ImageCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCacheManager.swift; sourceTree = "<group>"; };
 		0A33B7652BA60BFE00B209BF /* MovieDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailViewController.swift; sourceTree = "<group>"; };
 		0A33B7672BA612DE00B209BF /* MovieDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieDetailViewModel.swift; sourceTree = "<group>"; };
@@ -93,6 +95,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A081A3B2BF15C3D000A8197 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				0A081A3C2BF15C49000A8197 /* AlertPresentable.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
 		0A33B7602BA5F21700B209BF /* Managers */ = {
 			isa = PBXGroup;
 			children = (
@@ -248,6 +258,7 @@
 		0AB220852B9DD36A00A94ADA /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				0A081A3B2BF15C3D000A8197 /* Protocols */,
 				0A33B7602BA5F21700B209BF /* Managers */,
 				0AFB8D882B9F8D91009570CD /* Constants */,
 				0AB220972B9E0D5500A94ADA /* Enums */,
@@ -378,6 +389,7 @@
 				0AB2209F2B9E4EEE00A94ADA /* HomeHeaderCollectionReusableView.swift in Sources */,
 				0AB220912B9DE0D200A94ADA /* EndPoint.swift in Sources */,
 				0A6BE9122BF115D000E1FB7E /* MovieResponse.swift in Sources */,
+				0A081A3D2BF15C49000A8197 /* AlertPresentable.swift in Sources */,
 				0A67CE882BA5046700AD2B59 /* MovieCollectionViewCell.swift in Sources */,
 				0AB220892B9DD38900A94ADA /* UIViewController+Ext.swift in Sources */,
 				0AB220962B9E01CE00A94ADA /* HomeCollectionGenreCollectionViewCell.swift in Sources */,

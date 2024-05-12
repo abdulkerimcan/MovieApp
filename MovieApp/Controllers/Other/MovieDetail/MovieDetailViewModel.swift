@@ -24,15 +24,19 @@ extension MovieDetailViewModel: MovieDetailViewModelProtocol {
     
     func addWatchList(movie: MovieResult) {
         MovieService.shared.addWatchList(movie: movie)
+            .receive(on: RunLoop.main)
             .sink { event in
                 switch event {
                 case .finished:
                     break
                 case .failure(let error):
-                    print(error.localizedDescription)
+                    self.view?.showAlert(title: "Error", message: error.localizedDescription, action: {
+                    })
                 }
             } receiveValue: { response in
-                print(response.status_message)
+                self.view?.showAlert(title: nil, message: response.status_message, action: {
+                    
+                })
             }.store(in: &cancellable)
     }
     
