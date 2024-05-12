@@ -22,6 +22,7 @@ protocol SearchViewModelProtocol {
     var view: SearchViewControllerProtocol? {get set}
     func viewDidLoad()
     func searchMovies(query: String)
+    func selectMovie(indexPath: IndexPath)
     func transform(input: AnyPublisher<SearchInput,Never>) -> AnyPublisher<SearchOutput,Never>
 }
 
@@ -33,6 +34,10 @@ final class SearchViewModel {
 }
 
 extension SearchViewModel: SearchViewModelProtocol {
+    func selectMovie(indexPath: IndexPath) {
+        view?.navigateToDetail(movie: movies[indexPath.item])
+    }
+    
     func transform(input: AnyPublisher<SearchInput, Never>) -> AnyPublisher<SearchOutput, Never> {
         input.sink { [unowned self] input in
             switch input {

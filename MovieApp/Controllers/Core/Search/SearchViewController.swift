@@ -12,6 +12,7 @@ protocol SearchViewControllerProtocol: AnyObject {
     func configureVC()
     func configureCollectionView()
     func startSpinner()
+    func navigateToDetail(movie: MovieResult)
     func stopSpinner()
     func bind()
 }
@@ -54,6 +55,13 @@ final class SearchViewController: UIViewController {
 }
 
 extension SearchViewController: SearchViewControllerProtocol {
+    func navigateToDetail(movie: MovieResult) {
+        DispatchQueue.main.async {
+            let vc = MovieDetailViewController(movie: movie, viewModel: MovieDetailViewModel())
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
     func startSpinner() {
         DispatchQueue.main.async {
             self.spinner.startAnimating()
@@ -123,6 +131,9 @@ extension SearchViewController: UICollectionViewDataSource, UICollectionViewDele
         }
         cell.configureCell(with: viewModel.movies[indexPath.item])
         return cell
+    }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        viewModel.selectMovie(indexPath: indexPath)
     }
 }
 
