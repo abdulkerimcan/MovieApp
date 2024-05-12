@@ -1,5 +1,5 @@
 //
-//  Movie.swift
+//  MovieListResponse.swift
 //  MovieApp
 //
 //  Created by Abdulkerim Can on 10.03.2024.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MovieRequest: Codable {
+struct MovieListResponse: Codable {
     let page: Int
     let results: [MovieResult]
     

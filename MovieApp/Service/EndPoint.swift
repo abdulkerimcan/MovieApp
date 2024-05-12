@@ -16,8 +16,12 @@ enum EndPoint {
     case horror
     case action
     case scifi
+    case watchList
+    
       func getUrl() -> URL? {
         switch self {
+        case .watchList:
+            return URL(string: "\(EndPoint.baseURL)/account/21086962/watchlist/movies")
         case .upcoming:
             return URL(string: "\(EndPoint.baseURL)/movie/upcoming")
         case .topRated:

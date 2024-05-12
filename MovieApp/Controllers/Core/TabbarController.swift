@@ -39,7 +39,7 @@ private extension TabbarController {
     }
     
     func createWatchListTab() -> UINavigationController {
-        let vc = WatchListViewController()
+        let vc = WatchListViewController(viewModel: WatchListViewModel())
         let nav = UINavigationController(rootViewController: vc)
         nav.navigationBar.prefersLargeTitles = true
         nav.tabBarItem = UITabBarItem(title: "Watch List", image: UIImage(systemName: "play.tv"), tag: 2)

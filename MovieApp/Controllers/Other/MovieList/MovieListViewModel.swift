@@ -8,23 +8,12 @@
 import Foundation
 import Combine
 
-enum MovieListViewModelInput {
-    case viewDidLoad
-}
-
-enum MovieListViewModelOutput {
-    case serviceFailed(error: Error)
-    case serviceSucceed
-    case setLoading(isLoading: Bool)
-}
-
-
 protocol MovieListViewModelProtocol {
     var view: MovieListViewControllerProtocol? {get set}
     func viewDidLoad()
     func selectMovie(at indexPath: IndexPath)
     func fetchMovies()
-    func transform(input: AnyPublisher<MovieListViewModelInput,Never>) -> AnyPublisher<MovieListViewModelOutput,Never>
+    func transform(input: AnyPublisher<Input,Never>) -> AnyPublisher<Output,Never>
 }
 
 final class MovieListViewModel {
@@ -32,7 +21,7 @@ final class MovieListViewModel {
     let endpoint: EndPoint
     var movies:[MovieResult] = []
     private var cancellables = Set<AnyCancellable>()
-    private var output = PassthroughSubject<MovieListViewModelOutput,Never>()
+    private var output = PassthroughSubject<Output,Never>()
     
     //MARK: init -
     init( endpoint: EndPoint) {
@@ -62,11 +51,13 @@ extension MovieListViewModel: MovieListViewModelProtocol {
         
     }
     
-    func transform(input: AnyPublisher<MovieListViewModelInput,Never>) -> AnyPublisher<MovieListViewModelOutput,Never> {
+    func transform(input: AnyPublisher<Input,Never>) -> AnyPublisher<Output,Never> {
         input.sink {[unowned self] event in
             switch event {
             case .viewDidLoad:
                 self.fetchMovies()
+            case .viewWillAppear:
+                break
             }
         }.store(in: &cancellables)
         

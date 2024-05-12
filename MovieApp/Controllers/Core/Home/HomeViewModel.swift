@@ -8,22 +8,12 @@
 import Foundation
 import Combine
 
-enum HomeViewModelInput {
-    case viewDidLoad
-}
-
-enum HomeViewModelOutput {
-    case serviceFailed(error: Error)
-    case serviceSucceed
-    case setLoading(isLoading: Bool)
-}
-
 protocol HomeViewModelProtocol {
     var view: HomeViewControllerProtocol? {get set}
     func viewDidLoad()
     func selectMovie(at indexPath: IndexPath)
     func fetchMovies()
-    func transform(input: AnyPublisher<HomeViewModelInput,Never>) -> AnyPublisher<HomeViewModelOutput, Never>
+    func transform(input: AnyPublisher<Input,Never>) -> AnyPublisher<Output, Never>
 }
 
 final class HomeViewModel {
@@ -46,16 +36,18 @@ final class HomeViewModel {
                                    .popular]
     var movies: [MovieResult] = []
 
-    private let output = PassthroughSubject<HomeViewModelOutput, Never>()
+    private let output = PassthroughSubject<Output, Never>()
     var cancellables = Set<AnyCancellable>()
     
 }
 
 extension HomeViewModel: HomeViewModelProtocol {
     
-    func transform(input: AnyPublisher<HomeViewModelInput, Never>) -> AnyPublisher<HomeViewModelOutput, Never> {
+    func transform(input: AnyPublisher<Input, Never>) -> AnyPublisher<Output, Never> {
         input.sink { event in
             switch event {
+            case .viewWillAppear:
+                break
             case .viewDidLoad:
                 self.fetchMovies()
             }

@@ -36,7 +36,7 @@ final class MovieListViewController: UIViewController {
     
     private var cancellables = Set<AnyCancellable>()
     
-    private var input = PassthroughSubject<MovieListViewModelInput,Never>()
+    private var input = PassthroughSubject<Input,Never>()
     
     init(genreTitle: String,viewModel: MovieListViewModel) {
         self.viewModel = viewModel

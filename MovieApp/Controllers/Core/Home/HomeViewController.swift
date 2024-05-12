@@ -32,9 +32,8 @@ final class HomeViewController: UIViewController {
     }()
     
     var viewModel: HomeViewModel
-    
     var cancellables = Set<AnyCancellable>()
-    let input = PassthroughSubject<HomeViewModelInput,Never>()
+    let input = PassthroughSubject<Input,Never>()
     
     init(viewModel: HomeViewModel) {
         self.viewModel = viewModel

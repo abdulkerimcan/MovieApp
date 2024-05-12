@@ -6,21 +6,74 @@
 //
 
 import UIKit
+import Combine
 
 protocol MovieDetailViewControllerProtocol: AnyObject {
     func configureVC()
+    func configureGradient()
+    func configureGradientFrame()
 }
 
 final class MovieDetailViewController: UIViewController {
     
-    private lazy var movieInformationView: MovieInformationView = {
-        let movieView = MovieInformationView(frame: .zero)
-        movieView.translatesAutoresizingMaskIntoConstraints = false
-        return movieView
+    private lazy var imageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
     }()
-    var movie: MovieResult
     
-    var viewModel: MovieDetailViewModel
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.numberOfLines = 0
+        label.font = .systemFont(ofSize: 20, weight: .bold)
+        label.textColor = .white
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
+    private lazy var overviewLabel: UILabel = {
+        let label = UILabel(frame: .zero)
+        label.numberOfLines = 0
+        label.font = .systemFont(ofSize: 18, weight: .medium)
+        label.textColor = .white
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var starImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.tintColor = .label
+        imageView.image = UIImage(systemName: "star.circle.fill")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
+    private lazy var voteAverageLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .systemFont(ofSize: 18, weight: .bold)
+        return label
+    }()
+    
+    private lazy var playButton: UIButton = {
+        let button = UIButton(frame: .zero)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setImage(UIImage(systemName: "play.circle.fill"), for: .normal)
+        button.addTarget(self, action: #selector(didTapPlayButton), for: .touchUpInside)
+        button.contentVerticalAlignment = .fill
+        button.contentHorizontalAlignment = .fill
+        return button
+    }()
+    
+    private var movie: MovieResult
+    
+    private var viewModel: MovieDetailViewModel
+    
+    private let gradientLayer = CAGradientLayer()
+    
+    private var cancellable = Set<AnyCancellable>()
     
     init(movie: MovieResult, viewModel: MovieDetailViewModel) {
         self.movie = movie
@@ -37,19 +90,78 @@ final class MovieDetailViewController: UIViewController {
         viewModel.view = self
         viewModel.viewDidLoad()
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        viewModel.viewDidLayoutSubviews()
+    }
+    
+    @objc func didTapPlayButton() {
+        viewModel.addWatchList(movie: movie)
+    }
 }
 
 extension MovieDetailViewController: MovieDetailViewControllerProtocol {
+    func configureGradientFrame() {
+        gradientLayer.frame = imageView.bounds
+    }
+    
+    func configureGradient() {
+        gradientLayer.colors = [UIColor.clear.cgColor, UIColor.black.cgColor]
+        gradientLayer.locations = [0.0, 1.0]
+        imageView.layer.addSublayer(gradientLayer)
+    }
+    
+    
     func configureVC() {
         view.backgroundColor = .systemBackground
-        view.addSubview(movieInformationView)
+        view.addSubviews(imageView,
+                        titleLabel,
+                        playButton,
+                        starImageView,
+                        voteAverageLabel,
+                        overviewLabel)
+        
         NSLayoutConstraint.activate([
-            movieInformationView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            movieInformationView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            movieInformationView.topAnchor.constraint(equalTo: view.topAnchor),
-            movieInformationView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            imageView.topAnchor.constraint(equalTo: view.topAnchor),
+            imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            imageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.6),
+            
+            
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            titleLabel.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -25),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 10),
+            
+            starImageView.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
+            starImageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            starImageView.heightAnchor.constraint(equalToConstant: 30),
+            starImageView.widthAnchor.constraint(equalToConstant: 30),
+            
+            voteAverageLabel.leadingAnchor.constraint(equalTo: starImageView.trailingAnchor, constant: 2),
+            voteAverageLabel.topAnchor.constraint(equalTo: starImageView.topAnchor),
+            voteAverageLabel.bottomAnchor.constraint(equalTo: starImageView.bottomAnchor),
+            
+            playButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            playButton.topAnchor.constraint(equalTo: titleLabel.topAnchor),
+            playButton.bottomAnchor.constraint(equalTo: starImageView.bottomAnchor),
+            playButton.heightAnchor.constraint(equalToConstant: 50),
+            playButton.widthAnchor.constraint(equalToConstant: 50),
+            
+            overviewLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            overviewLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 10),
+            overviewLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 50),
+            
         ])
         
-        movieInformationView.configure(with: movie)
+        ImageCacheManager.shared.loadImage(urlString: movie._backdropPath)
+            .sink { [unowned self] image in
+                self.imageView.image = image
+            }.store(in: &cancellable)
+        
+        let voteValue = (movie._voteAverage * 10).rounded() / 10
+        voteAverageLabel.text = "\(voteValue)"
+        titleLabel.text = movie._title
+        overviewLabel.text = movie._overview
     }
 }

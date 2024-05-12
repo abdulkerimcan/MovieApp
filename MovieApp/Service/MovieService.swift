@@ -22,19 +22,25 @@ final class MovieService {
     ]
     private init() { }
     
-    func fetchMovies(endPoint: EndPoint) -> AnyPublisher<MovieRequest,Error> {
-        
-        guard let url = endPoint.getUrl() else {
+    func addWatchList(movie: MovieResult) -> AnyPublisher<MovieResponse,Error> {
+        let movieRequest = MovieRequest(media_type: "movie", media_id: movie._id, watchlist: true)
+        guard let url = URL(string: "https://api.themoviedb.org/3/account/21086962/watchlist") else {
             return Fail(error: ServiceError.badRequest).eraseToAnyPublisher()
         }
+        let data = try? JSONEncoder().encode(movieRequest)
         
         var request = URLRequest(url: url,cachePolicy: .useProtocolCachePolicy,timeoutInterval: 10.0)
-        request.httpMethod = "GET"
-        request.allHTTPHeaderFields = headers
         
+        request.httpMethod = "POST"
+        request.httpBody = data
+        request.allHTTPHeaderFields = headers
+        request.setValue("application/json",
+                         forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json",
+                         forHTTPHeaderField: "Accept")
         return session.dataTaskPublisher(for: request)
             .map(\.data)
-            .decode(type: MovieRequest.self, decoder: JSONDecoder())
+            .decode(type: MovieResponse.self, decoder: JSONDecoder())
             .mapError { error in
                 switch error {
                 case is URLError:
@@ -48,7 +54,33 @@ final class MovieService {
             .eraseToAnyPublisher()
     }
     
-    func searchMovie(query: String) -> AnyPublisher<MovieRequest, Error>  {
+    func fetchMovies(endPoint: EndPoint) -> AnyPublisher<MovieListResponse,Error> {
+        
+        guard let url = endPoint.getUrl() else {
+            return Fail(error: ServiceError.badRequest).eraseToAnyPublisher()
+        }
+        
+        var request = URLRequest(url: url,cachePolicy: .useProtocolCachePolicy,timeoutInterval: 10.0)
+        request.httpMethod = "GET"
+        request.allHTTPHeaderFields = headers
+        
+        return session.dataTaskPublisher(for: request)
+            .map(\.data)
+            .decode(type: MovieListResponse.self, decoder: JSONDecoder())
+            .mapError { error in
+                switch error {
+                case is URLError:
+                    return error
+                case is DecodingError:
+                    return error
+                default:
+                    return ServiceError.dataError
+                }
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    func searchMovie(query: String) -> AnyPublisher<MovieListResponse, Error>  {
         
         let urlString = "\(EndPoint.baseURL)/search/movie"
         var urlComponents = URLComponents(string: urlString)!
@@ -70,7 +102,7 @@ final class MovieService {
             .compactMap({ data in
                 data.data
             })
-            .decode(type: MovieRequest.self, decoder: JSONDecoder())
+            .decode(type: MovieListResponse.self, decoder: JSONDecoder())
             .catch { error in
                 Fail(error: error).eraseToAnyPublisher()
             }
