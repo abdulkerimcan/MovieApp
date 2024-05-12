@@ -63,7 +63,7 @@ extension WatchListViewController: WatchListViewControllerProtocol {
                 print(error)
             case .serviceSucceed:
                 reloadData()
-            case .setLoading(let isLoading):
+            case .setLoading:
                 break
             }
         }.store(in: &cancellables)
@@ -87,14 +87,13 @@ extension WatchListViewController: WatchListViewControllerProtocol {
     }
     
     func configureVC() {
-        
+        title = "Watch List"
     }
 }
 
 extension WatchListViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        print(viewModel.movies.count)
-        return viewModel.movies.count
+        viewModel.movies.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -104,6 +103,4 @@ extension WatchListViewController: UICollectionViewDelegate, UICollectionViewDat
         cell.configureCell(with: viewModel.movies[indexPath.item])
         return cell
     }
-    
-    
 }
